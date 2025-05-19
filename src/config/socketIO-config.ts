@@ -1,7 +1,6 @@
 import { Server } from "socket.io";
 import { Server as HttpServer } from "http";
 import { logger } from "../utils/logger";
-import { watchTTSFolder } from "../utils/tts-folder-listener";
 
 let io: Server;
 

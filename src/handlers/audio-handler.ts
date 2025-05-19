@@ -38,7 +38,7 @@ class AudioHandler {
       const response = await callOllama(transcription);
 
       // generates the speech from the response // Sockets are used to send the wav file to the client in here.
-      const ttsResponse = await ttsService.generateSpeech(response);
+      const ttsResponse = await ttsService.generateSpeech(response, "af_heart");
 
       res.status(200).json({
         success: true,
