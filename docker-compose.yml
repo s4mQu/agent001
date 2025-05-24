@@ -1,6 +1,7 @@
+name: agent001
 services:
-  app:
-    container_name: agent001
+  backend:
+    container_name: agent001-backend
     build:
       context: .
       dockerfile: Dockerfile
@@ -20,3 +21,16 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    depends_on:
+      - redis
+  redis:
+    container_name: agent001-redis
+    image: redis/redis-stack:latest
+    ports:
+      - "0.0.0.0:6379:6379"
+      - "0.0.0.0:3060:8001"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

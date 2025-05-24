@@ -8,9 +8,11 @@ import audioRoutes from "./routes/audio-routes";
 import { logger } from "./utils/logger";
 import path from "path";
 import fs from "fs";
+import uuid4 from "uuid4";
 
 import { createServer } from "http";
 import { initializeWebSocket } from "./config/socketIO-config";
+import { chatService } from "./services/chat-service";
 
 // Load environment variables
 config();
