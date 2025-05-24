@@ -17,25 +17,19 @@ export class TTSService {
   }
 
   async generateSpeech(text: string, voice: string = "bf_emma"): Promise<string> {
-    const io = getIO(); // this gives us access to the socket.io server instance.
-    const watcher = watchTTSFolder(); // this is used to watch the tts folder for new files.
+    const io = getIO();
+    const watcher = watchTTSFolder();
 
-    // when a new file is added. send the wav file to the client:
-    watcher.on("add", (filePath) => {
+    watcher.on("add", async (filePath) => {
       console.log("TTS file detected:", filePath);
       try {
-        // Check if file exists and get its stats
         const stats = fs.statSync(filePath);
-        console.log("File stats:", {
-          size: stats.size,
-          created: stats.birthtime,
-          modified: stats.mtime,
-        });
 
         const fileBuffer = fs.readFileSync(filePath);
 
-        // Send the file
         io.emit("tts-file-added", fileBuffer);
+
+        await this.cleanupWavFiles(filePath);
       } catch (error) {
         console.error("Error reading TTS file:", error);
         if (error instanceof Error) {
@@ -111,5 +105,34 @@ export class TTSService {
         }, 2000);
       });
     });
+  }
+
+  /**
+   * Cleans up WAV files from the TTS output directory
+   * @param filePath Optional specific file path to delete. If not provided, deletes all WAV files in the output directory
+   */
+  async cleanupWavFiles(filePath?: string): Promise<void> {
+    try {
+      if (filePath) {
+        // Delete specific file
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`Deleted WAV file: ${filePath}`);
+        }
+      } else {
+        // Delete all WAV files in the output directory
+        const files = fs.readdirSync(this.outputDir);
+        for (const file of files) {
+          if (file.endsWith(".wav")) {
+            const fullPath = path.join(this.outputDir, file);
+            fs.unlinkSync(fullPath);
+            console.log(`Deleted WAV file: ${file}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error cleaning up WAV files:", error);
+      throw error;
+    }
   }
 }

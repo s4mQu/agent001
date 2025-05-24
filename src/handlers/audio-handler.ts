@@ -15,8 +15,6 @@ class AudioHandler {
     try {
       const ttsService = new TTSService();
 
-      logger.info("Received audio transcription request");
-
       if (!req.file) {
         logger.error("No file received in request");
         res.status(400).json({ error: "No audio file provided" });
@@ -38,7 +36,7 @@ class AudioHandler {
       const response = await callOllama(transcription);
 
       // generates the speech from the response // Sockets are used to send the wav file to the client in here.
-      const ttsResponse = await ttsService.generateSpeech(response);
+      const ttsResponse = await ttsService.generateSpeech(response, "af_heart");
 
       res.status(200).json({
         success: true,
