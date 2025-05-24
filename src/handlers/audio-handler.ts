@@ -15,8 +15,6 @@ class AudioHandler {
     try {
       const ttsService = new TTSService();
 
-      logger.info("Received audio transcription request");
-
       if (!req.file) {
         logger.error("No file received in request");
         res.status(400).json({ error: "No audio file provided" });
